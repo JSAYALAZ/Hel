@@ -1,0 +1,120 @@
+package ups;
+
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Scanner;
+
+public class ManejoArchivos extends Frame implements ActionListener{
+    private TextArea txtArea;
+    private Button btnAbrir, btnGuardar;
+    private FileDialog archivoPlano;
+    
+
+    public ManejoArchivos(){
+        setTitle("Manejando archivos Planos :)");
+        setSize(700,680);
+        setLayout(new BorderLayout());
+
+
+        // crearc componentes
+        txtArea = new TextArea();
+        btnAbrir = new Button("Abrir");
+        btnGuardar = new Button("Guardar");
+
+        //configurar el area de texto
+        txtArea.setFont(new Font("Monospaced",Font.PLAIN,12));
+
+        //crear panel para los botones 
+        Panel panel = new Panel();
+        panel.add(btnAbrir);
+        panel.add(btnGuardar);
+
+        //añadir componentes de ventana
+        add(txtArea,BorderLayout.CENTER);
+        add(panel,BorderLayout.SOUTH);
+
+        //añadir los escuchadores de eventos
+        btnAbrir.addActionListener(this);
+        btnGuardar.addActionListener(this);
+
+        addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e){
+                System.exit(0);
+                
+            }
+        });  
+    }
+
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        String commando = e.getActionCommand();
+
+        if(commando.equals("Abrir")){
+            abrirArchivo();
+        }else if (commando.equals("Guardar")){
+            guardarArchivo();
+        }
+        
+    }
+    //metodos abrir y guardar archivo
+
+    public void abrirArchivo (){
+        archivoPlano = new FileDialog(this,"Abrir Archivo Personal",FileDialog.LOAD);
+
+        archivoPlano.setVisible(true);
+
+        String carpeta = archivoPlano.getDirectory();
+        String nombreArchivo = archivoPlano.getFile();
+
+
+        if(nombreArchivo != null){
+            File archivo = new File(carpeta,nombreArchivo);
+            try(Scanner scanner = new Scanner(archivo)){
+                txtArea.setText("");
+                while ((scanner.hasNextLine())) {
+                    txtArea.append(scanner.nextLine()+"\n");
+                    
+                }
+                
+            }catch (FileNotFoundException e){
+                e.printStackTrace();
+            }
+        }
+        
+
+
+        
+    }
+    public void guardarArchivo (){
+        archivoPlano = new FileDialog(this,"Guardar Archivo",FileDialog.SAVE);
+
+        archivoPlano.setVisible(true);
+
+        String carpeta = archivoPlano.getDirectory();
+        String nombreArchivo = archivoPlano.getFile();
+
+                if (nombreArchivo != null) {
+            File archivo = new File(carpeta, nombreArchivo);
+            try (PrintWriter writer = new PrintWriter(new FileWriter(archivo))) {
+                writer.print(txtArea.getText());              
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        
+        
+
+
+
+    }
+
+}
